@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+    <title>{% block title %}Portal{% endblock %}</title>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #f0f2f5;
+            color: #1a1a2e;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .base-content {
+            flex: 1;
+            animation: baseContentFadeIn 0.4s ease;
+        }
+
+        @keyframes baseContentFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Loading: botão com spinner */
+        .btn-loading {
+            position: relative;
+            pointer-events: none;
+        }
+
+        .btn-loading .btn-spinner {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: btnSpinner 0.7s linear infinite;
+        }
+
+        @keyframes btnSpinner {
+            to { transform: rotate(360deg); }
+        }
+
+        .search-form .btn-loading .btn-spinner {
+            width: 14px;
+            height: 14px;
+            margin: -7px 0 0 -7px;
+            border-width: 1.5px;
+        }
+
+        /* Footer */
+        .base-footer {
+            background: #046611;
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+            padding: 1.25rem 2rem;
+            font-size: 0.8rem;
+            margin-top: auto;
+        }
+
+        .base-footer a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+        }
+
+        .base-footer a:hover {
+            color: #fff;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="base-content">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <footer class="base-footer">
+        <p>&copy; 2026 CJB Softwares</p>
+        <a href="{% url 'privacy_policy' %}" target="_blank">Privacidade e Termos de Uso</a>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('form.js-submit-loading').forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    var btn = form.querySelector('button[type="submit"]');
+                    if (!btn || btn.classList.contains('btn-loading')) return;
+                    btn.classList.add('btn-loading');
+                    btn.setAttribute('data-original-text', btn.textContent.trim());
+                    btn.innerHTML = '<span class="btn-spinner"></span>';
+                });
+            });
+        });
+    </script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

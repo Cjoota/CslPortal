@@ -1,0 +1,913 @@
+{% extends "base.html" %}
+
+{% block title %}Pacientes{% if company_name %} | {{ company_name }}{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #21ac14 0%, #116915 100%);
+        color: #fff;
+        padding: 2rem 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .header-inner {
+        max-width: 100%;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+        width: 100%;
+        height: 100%;
+        max-height: 100%;
+        overflow: hidden;
+    }
+
+    .header .company-badge {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        backdrop-filter: blur(4px);
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    /* Search form */
+    .search-form {
+        display: flex;
+        align-items: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 50px;
+        padding: 0.25rem 0.3rem 0.25rem 1rem;
+        transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+        backdrop-filter: blur(4px);
+    }
+
+    .search-form:focus-within {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(255, 255, 255, 0.35);
+        box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.08);
+    }
+
+    .search-icon {
+        color: rgba(255, 255, 255, 0.5);
+        display: flex;
+        align-items: center;
+        margin-right: 0.5rem;
+        flex-shrink: 0;
+    }
+
+    .search-icon svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    .search-form input[type="text"] {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 0.85rem;
+        font-family: inherit;
+        width: 180px;
+        padding: 0.35rem 0;
+    }
+
+    .search-form input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.568);
+    }
+
+    .search-form button {
+        background: rgba(255, 255, 255, 0.18);
+        border: none;
+        color: #fff;
+        font-size: 0.78rem;
+        font-weight: 600;
+        font-family: inherit;
+        padding: 0.4rem 1rem;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+
+    .search-form button:hover {
+        background: rgba(255, 255, 255, 0.28);
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: background 0.2s;
+        backdrop-filter: blur(4px);
+    }
+
+    .btn-back:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-back svg {
+        width: 14px;
+        height: 14px;
+    }
+    
+    
+
+    /* Stats bar */
+    .stats-bar {
+        max-width: 100%;
+        margin: -1.5rem auto 0;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .stats-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.25rem 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f3460;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .stat-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #10b981;
+    }
+
+    /* Main content */
+    .main {
+        max-width: 100%;
+        margin: 2rem auto;
+        padding: 0 2rem 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    /* Patient Cards */
+    .patients-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .patient-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .patient-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .patient-card.open {
+        box-shadow: 0 4px 24px rgba(15, 52, 96, 0.12);
+    }
+
+    /* Patient Row (clickable header) */
+    .patient-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto auto;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.15s;
+    }
+
+    .patient-row:hover {
+        background: #f8fafc;
+    }
+
+    .patient-row .name-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .patient-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0f3460, #533483);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .name-info {
+        min-width: 0;
+    }
+
+    .patient-name {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .patient-cpf {
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.78rem;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+
+    .company-tag {
+        display: inline-block;
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .patient-meta {
+        font-size: 0.82rem;
+        color: #6b7280;
+        white-space: nowrap;
+    }
+
+    .exam-count-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .exam-count-badge.has-exams {
+        background: #ecfdf5;
+        color: #059669;
+    }
+
+    .exam-count-badge.no-exams {
+        background: #f3f4f6;
+        color: #9ca3af;
+    }
+
+    .toggle-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        transition: transform 0.3s ease, background 0.2s;
+        flex-shrink: 0;
+    }
+
+    .toggle-icon svg {
+        width: 16px;
+        height: 16px;
+        color: #64748b;
+        transition: transform 0.3s ease;
+    }
+
+    .patient-card.open .toggle-icon {
+        background: #e0f2fe;
+    }
+
+    .patient-card.open .toggle-icon svg {
+        transform: rotate(180deg);
+        color: #0f3460;
+    }
+
+    /* Expandable Details */
+    .patient-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+    }
+
+    .patient-card.open .patient-details {
+        max-height: 1000px;
+    }
+
+    .details-inner {
+        padding: 0 1.5rem 1.5rem;
+        border-top: 1px solid #f1f3f5;
+    }
+
+    /* Patient info grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        padding: 1.25rem 0;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #9ca3af;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-item span {
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    /* Exams Section */
+    .exams-section-title {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .exams-table-wrapper {
+        border-radius: 10px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden;
+    }
+
+    .exams-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .exams-table thead {
+        background: #f8fafc;
+    }
+
+    .exams-table thead th {
+        padding: 0.7rem 1rem;
+        text-align: left;
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .exams-table tbody tr {
+        border-bottom: 1px solid #f1f3f5;
+        transition: background 0.1s;
+    }
+
+    .exams-table tbody tr:last-child {
+        border-bottom: none;
+    }
+
+    .exams-table tbody tr:hover {
+        background: #fafbfc;
+    }
+
+    .exams-table tbody td {
+        padding: 0.7rem 1rem;
+        font-size: 0.85rem;
+        color: #374151;
+    }
+
+    /* Status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.25rem 0.65rem;
+        border-radius: 50px;
+        font-size: 0.76rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .status-badge::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .status-pendente {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    .status-pendente::before { background: #f59e0b; }
+
+    .status-coletado {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+    .status-coletado::before { background: #3b82f6; }
+
+    .status-aguardando_resultado {
+        background: #fae8ff;
+        color: #7e22ce;
+    }
+    .status-aguardando_resultado::before { background: #a855f7; }
+
+    .status-pronto {
+        background: #dcfce7;
+        color: #166534;
+    }
+    .status-pronto::before { background: #22c55e; }
+
+    .no-exams-msg {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: #9ca3af;
+        font-size: 0.88rem;
+    }
+
+    /* Status resumo + botao ver exames */
+    .open-exams {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f3f5;
+        margin-bottom: 0.75rem;
+    }
+
+    .button-view-exams {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1.2rem;
+        background: linear-gradient(135deg, #0f3460, #16213e);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        margin-left: auto;
+        transition: opacity 0.2s, transform 0.15s;
+        box-shadow: 0 2px 8px rgba(15, 52, 96, 0.25);
+    }
+
+    .button-view-exams:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 52, 96, 0.35);
+    }
+
+    .button-view-exams:active {
+        transform: translateY(0);
+    }
+
+    /* Empty state */
+    .empty-state {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .empty-text {
+        color: #9ca3af;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stats-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .patient-row {
+            grid-template-columns: 1fr auto;
+            gap: 0.75rem;
+        }
+
+        .patient-row .company-tag,
+        .patient-row .patient-meta {
+            display: none;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .exams-table-wrapper {
+            overflow-x: auto;
+        }
+
+        .exams-table {
+            min-width: 500px;
+        }
+    }
+    
+    .exam-type-tag {
+        display: inline-block;
+        background: #eef2ff;
+        color: #037a17;
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+    .button-view-exams {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+        padding: 0.5rem 1.2rem;
+        background: linear-gradient(135deg, #0f3460, #16213e);
+        color: #fff;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        margin-left: auto;
+        transition: opacity 0.2s, transform 0.15s;
+        box-shadow: 0 2px 8px rgba(15, 52, 96, 0.25);
+        align-self: center;
+    }
+    .button-view-exams:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(15, 52, 96, 0.35);
+    }
+    .button-view-exams:active {
+        transform: translateY(0);
+    }
+    .button-view-details {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        box-sizing: border-box;
+        gap: 0.6rem;
+        padding: 0.85rem 1.5rem;
+        background: linear-gradient(90deg, #2fd174, #21ac14 60%, #116915 100%);
+        color: #fff;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        transition: box-shadow 0.18s, transform 0.14s, background 0.22s;
+        box-shadow: 0 4px 20px 0 rgba(33, 172, 20, 0.12);
+        letter-spacing: 0.03em;
+    }
+    .button-view-details:hover,
+    .button-view-details:focus {
+        background: linear-gradient(90deg, #21ac14, #116915 70%);
+        box-shadow: 0 6px 30px 0 rgba(33, 172, 20, 0.17);
+        transform: translateY(-2px) scale(1.02);
+        outline: none;
+    }
+    .button-view-details:active {
+        transform: translateY(0) scale(0.99);
+        box-shadow: 0 2px 10px 0 rgba(33, 172, 20, 0.10);
+    }
+    </style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <div class="header-title">
+            <div class="header-icon">&#9764;</div>
+            <h1>
+                {%if user.is_authenticated%}
+                    Bem vindo, {{user.first_name}}
+                {%else%}
+                    Modo Admin
+                {%endif%}
+            </h1>
+        </div>
+        {% if company_name %}
+            <span class="company-badge">&#127970; {{ company_name }}</span>
+        {% endif %}
+        <div class="header-actions">
+            <form method="get" action="{% url 'patients' %}" class="search-form">
+                <span class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                    </svg>
+                </span>
+                <input type="text" name="patient" placeholder="Buscar colaborador">
+                <button type="submit">Buscar</button>
+            </form>
+           
+            <a class="btn-back" href="{% url 'referrals' %}">
+                Encaminhamentos
+            </a>
+            <a class="btn-back" href="{% url 'patients' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                </svg>
+                Voltar
+            </a>
+            <a class="btn-back" href="{% url 'logout' %}">Sair
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                </svg>
+            </a>
+            
+        </div>
+    </div>
+</header>
+
+<!-- Stats -->
+<div class="stats-bar">
+    <div class="stats-card">
+        <div class="stat-item">
+            <div class="stat-dot"></div>
+            <span class="stat-number">{{ patients|length }}</span>
+            <span class="stat-label">colaborador{{ patients|length|pluralize:"es" }} encontrado{{ patients|length|pluralize:"s" }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="main">
+    <div class="section-header">
+        <span class="section-title">Colaboradores cadastrados</span>
+    </div>
+
+    {% if patients %}
+    <div class="patients-list">
+        {% for patient in patients %}
+        <div class="patient-card" id="patient-{{ patient.id }}">
+            <!-- Linha principal clicavel -->
+            <div class="patient-row" onclick="togglePatient('{{ patient.id }}')">
+                <div class="name-cell">
+                    <span class="patient-avatar">{{ patient.name|first }}</span>
+                    <div class="name-info">
+                        <div class="patient-name">{{ patient.name }}</div>
+                        <div class="patient-cpf">{{ patient.cpf }}</div>
+                    </div>
+                </div>
+                <span class="exam-type-tag">{{ patient.exam_type|upper }}</span>
+                {% if user.is_superuser %}
+                    <span class="company-tag">{{ patient.company.name }}</span>
+                {% endif %}
+                {% if patient.all_exams_ready %}
+                    <span class="status-badge status-pronto">
+                        Pronto
+                    </span>
+                {% elif patient.has_pending_exams %}
+                    <span class="status-badge status-pendente">
+                        Pendente
+                    </span>
+                {% elif patient.has_collected_exams %}
+                    <span class="status-badge status-coletado">
+                        Coletado
+                    </span>
+                {% elif patient.has_waiting_exams %}
+                    <span class="status-badge status-aguardando_resultado">
+                        Aguardando resultado
+                    </span>
+                {% endif %}
+                {% with exam_count=patient.exams_patient.count %}
+                <span class="exam-count-badge {% if exam_count > 0 %}has-exams{% else %}no-exams{% endif %}">
+                    &#128203; {{ exam_count }} exame{{ exam_count|pluralize:"s" }}
+                </span>
+                {% endwith %}
+                <div class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Area expansivel com detalhes -->
+             
+            <div class="patient-details">
+                
+                <div class="details-inner">
+                    
+                    <!-- Info do paciente -->
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Nome Completo</label>
+                            <span>{{ patient.name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Tipo de Exame</label>
+                            <span>{{ patient.exam_type|upper }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Data de Comparecimento</label>
+                            <span>{{ patient.created_at|date:"d/m/Y" }}</span>
+                        </div>
+                    </div>
+                    <div class="open-exams">
+                        {% if patient.has_pending_exams %}
+                            <span class="status-badge status-pendente">Exame pendente</span>
+                        {% endif %}
+                        {% if patient.has_collected_exams %}
+                            <span class="status-badge status-coletado">Exame coletado</span>
+                        {% endif %}
+                        {% if patient.has_waiting_exams %}
+                            <span class="status-badge status-aguardando_resultado">Aguardando resultado</span>
+                        {% endif %}
+                        {% if patient.has_ready_exams %}
+                            <span class="status-badge status-pronto">Exame pronto</span>
+                        {% endif %}
+                        {% if patient.all_exams_ready and patient.exam_path %}
+                            <a class="button-view-exams" href="{% url 'open_exam_file' patient.id %}" target="_blank">
+                                Ver exames
+                            </a>
+
+                        {% elif patient.all_exams_ready and not patient.exam_path %}
+                            <span class="button-view-exams">Exame Digitalizando...
+                               
+
+                            </span>
+                        {% endif %}
+                    </div>
+                    <!-- Exames -->
+                    <div class="exams-section-title">&#127981; Exames do Paciente</div>
+                    
+
+                    {% with exams=patient.exams_patient.all %}
+                    {% if exams %}
+                    <div class="exams-table-wrapper">
+                        <table class="exams-table">
+                            <thead>
+                                <tr>
+                                    <th>Exame</th>
+                                    <th>Data de Coleta</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for exam in exams %}
+                                <tr>
+                                    <td><strong>{{ exam.name }}</strong></td>
+                                    <td>{{ exam.collected_date|date:"d/m/Y"|default:"Pendente" }}</td>
+                                    <td>
+                                        <span class="status-badge status-{{ exam.exam_status }}">
+                                            {{ exam.get_exam_status_display }}
+                                        </span>
+                                    </td>
+                                    
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="no-exams-msg">Nenhum exame registrado para este paciente.</div>
+                    {% endif %}
+                    {% endwith %}
+
+                </div>
+                <a class="button-view-details" href="{% url 'patient_detail' patient.pk %}">Ver detalhes</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">&#128101;</div>
+        <p class="empty-text">Nenhum paciente encontrado.</p>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePatient(id) {
+        const card = document.getElementById('patient-' + id);
+        card.classList.toggle('open');
+    }
+    function closeModal() {
+        const modal = document.getElementById('new-encamination-modal');
+        modal.close();
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+
+{% block title %}Novo Encaminhamento{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #21ac14 0%, #116915 100%);
+        color: #fff;
+        padding: 2rem 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-header {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: background 0.2s;
+        backdrop-filter: blur(4px);
+    }
+
+    .btn-header:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-header svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    /* Main content */
+    .main {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 0 2rem 3rem;
+    }
+
+    /* Form Card */
+    .form-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem 2rem;
+    }
+
+    .form-card h2 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #1a1a2e;
+        margin-bottom: 0.4rem;
+        text-align: center;
+    }
+
+    .form-subtitle {
+        font-size: 0.88rem;
+        color: #6b7280;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    /* Form fields */
+    .form-card form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.25rem;
+    }
+
+    .form-card form p {
+        display: flex;
+        flex-direction: column;
+        gap: 0.35rem;
+        margin: 0;
+    }
+
+    .form-card form label {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: #374151;
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+    }
+
+    .form-card form input[type="text"],
+    .form-card form input[type="number"],
+    .form-card form input[type="date"],
+    .form-card form input[type="time"],
+    .form-card form input[type="email"],
+    .form-card form input[type="password"],
+    .form-card form select {
+        width: 100%;
+        padding: 0.65rem 1rem;
+        border-radius: 10px;
+        border: 1.5px solid #e5e7eb;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #1a1a2e;
+        font-family: inherit;
+        background: #fafbfc;
+        transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+    }
+
+    .form-card form input:focus,
+    .form-card form select:focus {
+        outline: none;
+        border-color: #21ac14;
+        box-shadow: 0 0 0 3px rgba(33, 172, 20, 0.1);
+        background: #fff;
+    }
+
+    .form-card form select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 1rem center;
+        padding-right: 2.5rem;
+    }
+
+    /* Submit button */
+    .btn-submit {
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        border-radius: 10px;
+        border: none;
+        background: linear-gradient(135deg, #21ac14, #116915);
+        color: #fff;
+        font-size: 0.92rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        margin-top: 0.5rem;
+        transition: opacity 0.2s, transform 0.15s;
+        box-shadow: 0 4px 14px rgba(17, 105, 21, 0.3);
+    }
+
+    .btn-submit:hover {
+        opacity: 0.92;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 20px rgba(17, 105, 21, 0.35);
+    }
+
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+
+    /* Help text from Django forms */
+    .form-card form .helptext {
+        font-size: 0.75rem;
+        color: #9ca3af;
+    }
+
+    .form-card form ul.errorlist {
+        list-style: none;
+        padding: 0;
+        margin: 0.25rem 0 0;
+    }
+
+    .form-card form ul.errorlist li {
+        font-size: 0.78rem;
+        color: #dc2626;
+        font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .main {
+            padding: 0 1rem 2rem;
+        }
+
+        .form-card {
+            padding: 2rem 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <div class="header-title">
+            <div class="header-icon">&#128203;</div>
+            <h1>Novo Encaminhamento</h1>
+        </div>
+        <div class="header-actions">
+            <a class="btn-header" href="{% url 'referrals' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                </svg>
+                Encaminhamentos
+            </a>
+            <a class="btn-header" href="{% url 'patients' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                </svg>
+                Voltar
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Main Content -->
+<main class="main">
+    <div class="form-card">
+        <h2>Novo Encaminhamento</h2>
+        <p class="form-subtitle">Preencha os dados do funcionario para criar o encaminhamento.</p>
+
+        <form id="new-referral-form" method="post" action="{% url 'new_referral' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit">Criar Encaminhamento</button>
+        </form>
+    </div>
+</main>
+{% endblock %}

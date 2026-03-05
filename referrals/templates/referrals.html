@@ -1,0 +1,666 @@
+{% extends "base.html" %}
+
+{% block title %}Encaminhamentos{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Header */
+    .header {
+        background: linear-gradient(135deg, #21ac14 0%, #116915 100%);
+        color: #fff;
+        padding: 2rem 0;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .header-inner {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-icon {
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.4rem;
+    }
+
+    .header h1 {
+        font-size: 1.6rem;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .header-actions {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .btn-header {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        color: #fff;
+        font-size: 0.82rem;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        text-decoration: none;
+        transition: background 0.2s;
+        backdrop-filter: blur(4px);
+    }
+
+    .btn-header:hover {
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-header svg {
+        width: 14px;
+        height: 14px;
+    }
+
+    .btn-new {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-new:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Stats bar */
+    .stats-bar {
+        max-width: 1100px;
+        margin: -1.5rem auto 0;
+        padding: 0 2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+    .stats-card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 1.25rem 2rem;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #0f3460;
+    }
+
+    .stat-label {
+        font-size: 0.85rem;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .stat-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #10b981;
+    }
+
+    .stat-divider {
+        width: 1px;
+        height: 28px;
+        background: #e5e7eb;
+    }
+
+    .stat-dot.pending {
+        background: #f59e0b;
+    }
+
+    /* Main content */
+    .main {
+        max-width: 1100px;
+        margin: 2rem auto;
+        padding: 0 2rem 3rem;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+    }
+
+    .section-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    /* Referral Cards */
+    .referrals-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .referral-card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .referral-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .referral-card.open {
+        box-shadow: 0 4px 24px rgba(15, 52, 96, 0.12);
+    }
+
+    /* Referral Row (clickable header) */
+    .referral-row {
+        display: grid;
+        grid-template-columns: 1fr auto auto auto auto;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        user-select: none;
+        transition: background 0.15s;
+    }
+
+    .referral-row:hover {
+        background: #f8fafc;
+    }
+
+    .referral-row .name-cell {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        min-width: 0;
+    }
+
+    .referral-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #0f3460, #533483);
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 0.9rem;
+        flex-shrink: 0;
+    }
+
+    .name-info {
+        min-width: 0;
+    }
+
+    .referral-name {
+        font-weight: 600;
+        color: #1a1a2e;
+        font-size: 0.95rem;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .referral-cpf {
+        font-family: 'Consolas', 'Courier New', monospace;
+        font-size: 0.78rem;
+        color: #9ca3af;
+        margin-top: 2px;
+    }
+
+    .company-tag {
+        display: inline-block;
+        background: #eef2ff;
+        color: #4338ca;
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .exam-type-tag {
+        display: inline-block;
+        background: #fef3c7;
+        color: #92400e;
+        padding: 0.3rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .done-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.3rem 0.75rem;
+        border-radius: 50px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .done-badge.is-done {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .done-badge.is-pending {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .done-badge::before {
+        content: '';
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        flex-shrink: 0;
+    }
+
+    .done-badge.is-done::before {
+        background: #22c55e;
+    }
+
+    .done-badge.is-pending::before {
+        background: #f59e0b;
+    }
+
+    .toggle-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        background: #f1f5f9;
+        transition: transform 0.3s ease, background 0.2s;
+        flex-shrink: 0;
+    }
+
+    .toggle-icon svg {
+        width: 16px;
+        height: 16px;
+        color: #64748b;
+        transition: transform 0.3s ease;
+    }
+
+    .referral-card.open .toggle-icon {
+        background: #e0f2fe;
+    }
+
+    .referral-card.open .toggle-icon svg {
+        transform: rotate(180deg);
+        color: #0f3460;
+    }
+
+    /* Expandable Details */
+    .referral-details {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.35s ease;
+    }
+
+    .referral-card.open .referral-details {
+        max-height: 600px;
+    }
+
+    .details-inner {
+        padding: 0 1.5rem 1.5rem;
+        border-top: 1px solid #f1f3f5;
+    }
+
+    /* Info grid */
+    .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1rem;
+        padding: 1.25rem 0;
+    }
+
+    .info-item label {
+        display: block;
+        font-size: 0.72rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #9ca3af;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-item span {
+        font-size: 0.9rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    /* Dialog */
+    dialog {
+        border: none;
+        border-radius: 14px;
+        box-shadow: 0 8px 40px rgba(0, 0, 0, 0.25);
+        padding: 2rem;
+        text-align: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        margin: 0;
+        max-width: 500px;
+        width: 90%;
+    }
+
+    dialog::backdrop {
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(4px);
+    }
+
+    dialog h2 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 1rem;
+    }
+
+    dialog p {
+        font-size: 1rem;
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+
+    dialog form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    dialog form label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #374151;
+        text-align: left;
+    }
+
+    dialog form input,
+    dialog form select {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: #374151;
+        font-family: inherit;
+        transition: border-color 0.2s;
+    }
+
+    dialog form input:focus,
+    dialog form select:focus {
+        outline: none;
+        border-color: #21ac14;
+        box-shadow: 0 0 0 3px rgba(33, 172, 20, 0.1);
+    }
+
+    dialog form button {
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        border: none;
+        background: linear-gradient(135deg, #21ac14, #116915);
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        transition: opacity 0.2s;
+    }
+
+    dialog form button:hover {
+        opacity: 0.9;
+    }
+
+    dialog #btnFechar {
+        padding: 0.6rem 1.2rem;
+        border-radius: 8px;
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        color: #374151;
+        font-size: 0.85rem;
+        font-weight: 600;
+        font-family: inherit;
+        cursor: pointer;
+        width: 100%;
+        margin-top: 0.5rem;
+        transition: background 0.2s;
+    }
+
+    dialog #btnFechar:hover {
+        background: #f3f4f6;
+    }
+
+    /* Empty state */
+    .empty-state {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        text-align: center;
+        padding: 4rem 2rem;
+    }
+
+    .empty-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        opacity: 0.4;
+    }
+
+    .empty-text {
+        color: #9ca3af;
+        font-size: 1rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .header-inner {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stats-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+
+        .stat-divider {
+            display: none;
+        }
+
+        .referral-row {
+            grid-template-columns: 1fr auto auto;
+            gap: 0.75rem;
+        }
+
+        .referral-row .company-tag,
+        .referral-row .exam-type-tag {
+            display: none;
+        }
+
+        .info-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Header -->
+<header class="header">
+    <div class="header-inner">
+        <div class="header-title">
+            <div class="header-icon">&#128203;</div>
+            <h1>Portal de Encaminhamentos</h1>
+        </div>
+        <div class="header-actions">
+            <a class="btn-header btn-new" href="{% url 'new_referral' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
+                </svg>
+                Novo Encaminhamento
+            </a>
+            <a class="btn-header" href="{% url 'patients' %}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 15L3 9m0 0l6-6M3 9h12a6 6 0 010 12h-3"/>
+                </svg>
+                Voltar
+            </a>
+        </div>
+    </div>
+</header>
+
+<!-- Stats -->
+<div class="stats-bar">
+    <div class="stats-card">
+        <div class="stat-item">
+            <div class="stat-dot"></div>
+            <span class="stat-number">{{ referrals|length }}</span>
+            <span class="stat-label">encaminhamento{{ referrals|length|pluralize:"s" }}</span>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content -->
+<main class="main">
+    <div class="section-header">
+        <span class="section-title">Lista de Encaminhamentos</span>
+    </div>
+
+    {% if referrals %}
+    <div class="referrals-list">
+        {% for referral in referrals %}
+        <div class="referral-card" id="referral-{{ referral.id }}">
+            <!-- Linha principal clicavel -->
+            <div class="referral-row" onclick="toggleReferral('{{ referral.id }}')">
+                <div class="name-cell">
+                    <span class="referral-avatar">{{ referral.employee_name|first }}</span>
+                    <div class="name-info">
+                        <div class="referral-name">{{ referral.employee_name }}</div>
+                        <div class="referral-cpf">{{ referral.employee_cpf }}</div>
+                    </div>
+                </div>
+                <span class="company-tag">{{ referral.company_name }}</span>
+                <span class="exam-type-tag">{{ referral.exam_type|upper }}</span>
+                <span class="done-badge {% if referral.done %}is-done{% else %}is-pending{% endif %}">
+                    {% if referral.done %}Concluido{% else %}Pendente{% endif %}
+                </span>
+                <div class="toggle-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Area expansivel com detalhes -->
+            <div class="referral-details">
+                <div class="details-inner">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label>Nome Completo</label>
+                            <span>{{ referral.employee_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>CPF</label>
+                            <span>{{ referral.employee_cpf }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Data de Nascimento</label>
+                            <span>{{ referral.employee_birth_date|date:"d/m/Y" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Funcao</label>
+                            <span>{{ referral.employee_function }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Setor</label>
+                            <span>{{ referral.employee_sector }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Empresa</label>
+                            <span>{{ referral.company_name }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Tipo de Exame</label>
+                            <span>{{ referral.exam_type }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Data de Admissao</label>
+                            <span>{{ referral.adm_date|date:"d/m/Y"|default:"Nao informado" }}</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Status</label>
+                            <span class="done-badge {% if referral.done %}is-done{% else %}is-pending{% endif %}">
+                                {% if referral.done %}Concluido{% else %}Pendente{% endif %}
+                            </span>
+                        </div>
+                        <div class="info-item">
+                            <label>Cadastrado em</label>
+                            <span>{{ referral.created_at|date:"d/m/Y H:i" }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="empty-icon">&#128203;</div>
+        <p class="empty-text">Nenhum encaminhamento encontrado.</p>
+    </div>
+    {% endif %}
+</main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function toggleReferral(id) {
+        const card = document.getElementById('referral-' + id);
+        card.classList.toggle('open');
+    }
+    function closeModal() {
+        const modal = document.getElementById('new-encamination-modal');
+        modal.close();
+    }
+</script>
+{% endblock %}
