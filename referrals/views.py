@@ -16,8 +16,8 @@ class ReferralsView(ListView):
         if self.request.user.is_superuser:
             referrals = referrals.all().order_by('-created_at')
         else:
-            if self.request.user.company:
-                referrals = referrals.filter(company=self.request.user.company).order_by('-created_at')
+            if self.request.user.company_name:
+                referrals = referrals.filter(company_name=self.request.user.company_name).order_by('-created_at')
             else:
                 referrals = referrals.none()
         return referrals
@@ -32,6 +32,6 @@ class NewReferralView(CreateView):
     
     def get_initial(self):
         initial = super().get_initial()
-        initial['company_name'] = self.request.user.company_name or ''
+        initial['company_name'] = self.request.user.company_name
         return initial
     

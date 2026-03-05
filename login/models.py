@@ -20,7 +20,7 @@ class User(AbstractUser):
     @property
     def company_name(self):
         """Nome da empresa do usuário (ou None se superuser sem company)."""
-        return self.company.name if self.company else None
+        return self.company.name
 
 
 
