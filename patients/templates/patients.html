@@ -700,7 +700,7 @@
             <div class="header-icon">&#9764;</div>
             <h1>
                 {%if user.is_authenticated%}
-                    Bem vindo, {{user.first_name}}
+                    Bem vindo{% if user.company_name %}, {{ user.company_name }}{% else %}, {{ user.username }}{% endif %}
                 {%else%}
                     Modo Admin
                 {%endif%}
