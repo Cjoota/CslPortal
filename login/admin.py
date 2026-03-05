@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth import get_user_model
-from login.models import Company
+
 
 User = get_user_model()
 
@@ -26,10 +26,3 @@ class UserAdmin(BaseUserAdmin):
         }),
     )
 
-
-class CompanyAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'cnpj', 'password', 'created_at')
-    search_fields = ('name', 'cnpj', 'password')
-
-
-admin.site.register(Company, CompanyAdmin)
