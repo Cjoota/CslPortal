@@ -80,10 +80,30 @@
         .base-footer a:hover {
             color: #fff;
         }
+
+        .site-logo-bar {
+            position: absolute;
+            top: 0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+
+        .site-logo-bar img {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.2));
+        }
     </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% block site_logo %}
+    <div class="site-logo-bar">
+        <img src="{% static 'logo.png' %}" alt="Logo">
+    </div>
+    {% endblock %}
+
     <div class="base-content">
         {% block content %}
         {% endblock %}

@@ -38,27 +38,15 @@ class Patient(models.Model):
 
     @property
     def has_pending_exams(self):
-        exams = self.exams_patient.all()
-        for exam in exams:
-            if exam.exam_status == 'Pendente':
-                return True
-        return False
+        return self.exams_patient.filter(exam_status='pendente').exists()
 
     @property
     def has_collected_exams(self):
-        exams = self.exams_patient.all()
-        for exam in exams:
-            if exam.exam_status == 'Coletado':
-                return True
-        return False
+        return self.exams_patient.filter(exam_status='coletado').exists()
 
     @property
     def has_waiting_exams(self):
-        exams = self.exams_patient.all()
-        for exam in exams:
-            if exam.exam_status == 'Aguardando resultado':
-                return True
-        return False
+        return self.exams_patient.filter(exam_status='aguardando_resultados').exists()
 
     @property
     def has_ready_exams(self):

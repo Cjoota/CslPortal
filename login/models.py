@@ -13,6 +13,13 @@ class User(AbstractUser):
         blank=True,
         related_name='users',
     )
+    sub_company = models.ForeignKey(
+        'companies.SubCompany',
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name='users',
+    )
 
     class Meta:
         db_table = 'login_user'
@@ -20,7 +27,10 @@ class User(AbstractUser):
     @property
     def company_name(self):
         """Nome da empresa do usuário (ou None se superuser sem company)."""
-        return self.company.name
+        return self.company.name if self.company else self.sub_company.name 
 
-
+    @property
+    def sub_company_name(self):
+        """Nome da subempresa do usuário (ou None se superuser sem subempresa)."""
+        return self.sub_company.name
 

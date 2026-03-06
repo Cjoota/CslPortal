@@ -259,8 +259,7 @@
 
     /* Patient Row (clickable header) */
     .patient-row {
-        display: grid;
-        grid-template-columns: 1fr auto auto auto auto;
+        display: flex;
         align-items: center;
         gap: 1.5rem;
         padding: 1rem 1.5rem;
@@ -278,6 +277,7 @@
         align-items: center;
         gap: 0.75rem;
         min-width: 0;
+        flex: 1;
     }
 
     .patient-avatar {
@@ -310,7 +310,7 @@
     .patient-cpf {
         font-family: 'Consolas', 'Courier New', monospace;
         font-size: 0.78rem;
-        color: #9ca3af;
+        color: #43474e;
         margin-top: 2px;
     }
 
@@ -508,17 +508,25 @@
     }
     .status-coletado::before { background: #3b82f6; }
 
-    .status-aguardando_resultado {
+    .status-aguardando_resultado,
+    .status-aguardando_resultados {
         background: #fae8ff;
         color: #7e22ce;
     }
-    .status-aguardando_resultado::before { background: #a855f7; }
+    .status-aguardando_resultado::before,
+    .status-aguardando_resultados::before { background: #a855f7; }
 
     .status-pronto {
         background: #dcfce7;
         color: #166534;
     }
     .status-pronto::before { background: #22c55e; }
+
+    .status-sem-exames {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    .status-sem-exames::before { background: #9ca3af; }
 
     .no-exams-msg {
         text-align: center;
@@ -600,7 +608,7 @@
         }
 
         .patient-row {
-            grid-template-columns: 1fr auto;
+            flex-wrap: wrap;
             gap: 0.75rem;
         }
 
@@ -625,7 +633,7 @@
     .exam-type-tag {
         display: inline-block;
         background: #eef2ff;
-        color: #037a17;
+        color: #012514;
         padding: 0.3rem 0.75rem;
         border-radius: 6px;
         font-size: 0.8rem;
@@ -702,12 +710,15 @@
                 {%if user.is_authenticated%}
                     Bem vindo{% if user.company_name %}, {{ user.company_name }}{% else %}, {{ user.username }}{% endif %}
                 {%else%}
-                    Modo Admin
+                    
                 {%endif%}
             </h1>
         </div>
         {% if company_name %}
             <span class="company-badge">&#127970; {{ company_name }}</span>
+
+        {% elif user.sub_company_name %}
+            <span class="company-badge">&#127970; {{ user.sub_company_name }}</span>
         {% endif %}
         <div class="header-actions">
             <form method="get" action="{% url 'patients' %}" class="search-form">
@@ -766,29 +777,25 @@
                     <span class="patient-avatar">{{ patient.name|first }}</span>
                     <div class="name-info">
                         <div class="patient-name">{{ patient.name }}</div>
-                        <div class="patient-cpf">{{ patient.cpf }}</div>
+                        <div class="patient-cpf">{{ patient.created_at|date:"d/m/Y" }}</div>
                     </div>
                 </div>
                 <span class="exam-type-tag">{{ patient.exam_type|upper }}</span>
-                {% if user.is_superuser %}
+                {% if user.is_superuser or user.sub_company %}
                     <span class="company-tag">{{ patient.company.name }}</span>
                 {% endif %}
-                {% if patient.all_exams_ready %}
-                    <span class="status-badge status-pronto">
-                        Pronto
-                    </span>
+                {% if patient.all_exams_ready and patient.exams_patient.exists %}
+                    <span class="status-badge status-pronto">Pronto</span>
                 {% elif patient.has_pending_exams %}
-                    <span class="status-badge status-pendente">
-                        Pendente
-                    </span>
+                    <span class="status-badge status-pendente">Pendente</span>
                 {% elif patient.has_collected_exams %}
-                    <span class="status-badge status-coletado">
-                        Coletado
-                    </span>
+                    <span class="status-badge status-coletado">Coletado</span>
                 {% elif patient.has_waiting_exams %}
-                    <span class="status-badge status-aguardando_resultado">
-                        Aguardando resultado
-                    </span>
+                    <span class="status-badge status-aguardando_resultado">Aguardando resultado</span>
+                {% elif patient.exams_patient.exists %}
+                    <span class="status-badge status-pronto">Pronto</span>
+                {% else %}
+                    <span class="status-badge status-sem-exames">Sem exames</span>
                 {% endif %}
                 {% with exam_count=patient.exams_patient.count %}
                 <span class="exam-count-badge {% if exam_count > 0 %}has-exams{% else %}no-exams{% endif %}">
