@@ -46,7 +46,7 @@ class Patient(models.Model):
 
     @property
     def has_waiting_exams(self):
-        return self.exams_patient.filter(exam_status='aguardando_resultados').exists()
+        return self.exams_patient.filter(exam_status='aguardando resultados').exists()
 
     @property
     def has_ready_exams(self):

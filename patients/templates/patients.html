@@ -508,13 +508,11 @@
     }
     .status-coletado::before { background: #3b82f6; }
 
-    .status-aguardando_resultado,
-    .status-aguardando_resultados {
+    .status-aguardando-resultados {
         background: #fae8ff;
         color: #7e22ce;
     }
-    .status-aguardando_resultado::before,
-    .status-aguardando_resultados::before { background: #a855f7; }
+    .status-aguardando-resultados::before { background: #a855f7; }
 
     .status-pronto {
         background: #dcfce7;
@@ -791,7 +789,7 @@
                 {% elif patient.has_collected_exams %}
                     <span class="status-badge status-coletado">Coletado</span>
                 {% elif patient.has_waiting_exams %}
-                    <span class="status-badge status-aguardando_resultado">Aguardando resultado</span>
+                    <span class="status-badge status-aguardando-resultados">Aguardando resultados</span>
                 {% elif patient.exams_patient.exists %}
                     <span class="status-badge status-pronto">Pronto</span>
                 {% else %}
@@ -876,8 +874,8 @@
                                     <td><strong>{{ exam.name }}</strong></td>
                                     <td>{{ exam.collected_date|date:"d/m/Y"|default:"Pendente" }}</td>
                                     <td>
-                                        <span class="status-badge status-{{ exam.exam_status }}">
-                                            {{ exam.get_exam_status_display }}
+                                        <span class="status-badge status-{{ exam.exam_status|slugify }}">
+                                            {{ exam.get_exam_status_display|capfirst }}
                                         </span>
                                     </td>
                                     

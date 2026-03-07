@@ -259,8 +259,8 @@
     .status-coletado { background: #dbeafe; color: #1e40af; }
     .status-coletado::before { background: #3b82f6; }
 
-    .status-aguardando_resultados { background: #fae8ff; color: #7e22ce; }
-    .status-aguardando_resultados::before { background: #a855f7; }
+    .status-aguardando-resultados { background: #fae8ff; color: #7e22ce; }
+    .status-aguardando-resultados::before { background: #a855f7; }
 
     .status-pronto { background: #dcfce7; color: #166534; }
     .status-pronto::before { background: #22c55e; }
@@ -379,7 +379,7 @@
                             <td><strong>{{ exam.name }}</strong></td>
                             <td>{{ exam.collected_date|date:"d/m/Y"|default:"—" }}</td>
                             <td>
-                                <span class="status-badge status-{{ exam.exam_status }}">
+                                <span class="status-badge status-{{ exam.exam_status|slugify }}">
                                     {{ exam.get_exam_status_display }}
                                 </span>
                             </td>
